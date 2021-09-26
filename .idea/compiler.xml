@@ -11,6 +11,7 @@
         <module name="sp-fastcampus-spring-sec.web-user-admin.test" />
         <module name="sp-fastcampus-spring-sec.server-basic-test.main" />
         <module name="sp-fastcampus-spring-sec.comp-common-utils.test" />
+        <module name="sp-fastcampus-spring-sec.server-login-session-management.main" />
         <module name="sp-fastcampus-spring-sec.web-student-teacher.test" />
         <module name="sp-fastcampus-spring-sec.server-basic-authentication-test.test" />
         <module name="sp-fastcampus-spring-sec.server-login-basic.test" />
@@ -22,6 +23,7 @@
         <module name="sp-fastcampus-spring-sec.server-login-rememberme.main" />
         <module name="sp-fastcampus-spring-sec.server-login-multi-chain.main" />
         <module name="sp-fastcampus-spring-sec.comp-user-admin.main" />
+        <module name="sp-fastcampus-spring-sec.server-login-session-management.test" />
         <module name="sp-fastcampus-spring-sec.server-basic-authentication-test.main" />
         <module name="sp-fastcampus-spring-sec.server-login-basic.main" />
         <module name="sp-fastcampus-spring-sec.server-login-custom-filter.main" />

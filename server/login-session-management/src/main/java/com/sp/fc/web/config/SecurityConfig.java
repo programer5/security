@@ -12,6 +12,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -50,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
+                .antMatchers("/sessions", "/session/expire", "/session-expired")
                 .requestMatchers(
                         PathRequest.toStaticResources().atCommonLocations(),
                         PathRequest.toH2Console()
@@ -87,6 +91,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    SessionRegistry sessionRegistry() {
+        SessionRegistryImpl registry = new SessionRegistryImpl();
+        return registry;
+    }
+
+    @Bean
     PersistentTokenRepository tokenRepository() {
         JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
         repository.setDataSource(dataSource);
@@ -102,6 +112,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     PersistentTokenBasedRememberMeServices rememberMeServices() {
         PersistentTokenBasedRememberMeServices service = new PersistentTokenBasedRememberMeServices("hello",
                 userService, tokenRepository());
+        service.setAlwaysRemember(true);
         return service;
     }
 
@@ -119,7 +130,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"))
-                .rememberMe(r->r.rememberMeServices(rememberMeServices()));
+                .rememberMe(r->r
+
+                        .rememberMeServices(rememberMeServices()))
+                .sessionManagement(
+                        s->s
+                                .sessionFixation(sessionFixationConfigurer -> sessionFixationConfigurer.changeSessionId())
+                                .maximumSessions(2)
+                                .maxSessionsPreventsLogin(true)
+                                .expiredUrl("/session-expired")
+                );
 
     }
 }
