@@ -140,7 +140,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 .failureUrl("/login-error")
                 )
                 .logout(logout -> logout.logoutSuccessUrl("/"))
-                .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"))
+                .exceptionHandling(exception ->
+                        exception
+//                        .accessDeniedPage("/access-denied")
+                        .accessDeniedHandler(new CustomDeniedHandler())
+                                .authenticationEntryPoint(new CustomEntryPoint())
+                )
+
                 .rememberMe(r->r
 
                         .rememberMeServices(rememberMeServices()))
