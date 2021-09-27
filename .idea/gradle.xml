@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/comp/common-utils" />
             <option value="$PROJECT_DIR$/comp/user-admin" />
+            <option value="$PROJECT_DIR$/server/authority-test" />
             <option value="$PROJECT_DIR$/server/basic-authentication-test" />
             <option value="$PROJECT_DIR$/server/basic-test" />
             <option value="$PROJECT_DIR$/server/login-basic" />
@@ -23,6 +24,7 @@
             <option value="$PROJECT_DIR$/server/login-rememberme" />
             <option value="$PROJECT_DIR$/server/login-session-management" />
             <option value="$PROJECT_DIR$/server/login-userdetails" />
+            <option value="$PROJECT_DIR$/test/web-util" />
             <option value="$PROJECT_DIR$/web/student-teacher" />
             <option value="$PROJECT_DIR$/web/user-admin" />
           </set>
