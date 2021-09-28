@@ -15,9 +15,9 @@ public class AuthorityBasicTest extends WebIntegrationTest {
     @Test
     void test_1() {
         client = new TestRestTemplate("user1", "1111");
-        ResponseEntity<String> response = client.getForEntity(uri("/greeting"), String.class);
+        ResponseEntity<String> response = client.getForEntity(uri("/greeting/minseo"), String.class);
 
-        assertEquals("hello", response.getBody());
+        assertEquals("hello minseo", response.getBody());
 
         System.out.println("response = " + response.getBody());
     }
