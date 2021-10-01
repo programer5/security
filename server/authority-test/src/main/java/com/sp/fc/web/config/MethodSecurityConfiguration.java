@@ -9,6 +9,7 @@ import org.springframework.security.access.expression.method.DefaultMethodSecuri
 import org.springframework.security.access.expression.method.ExpressionBasedPreInvocationAdvice;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
+import org.springframework.security.access.method.MethodSecurityMetadataSource;
 import org.springframework.security.access.prepost.PreInvocationAuthorizationAdviceVoter;
 import org.springframework.security.access.vote.*;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -19,11 +20,16 @@ import org.springframework.security.core.Authentication;
 import java.util.ArrayList;
 import java.util.List;
 
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class MethodSecurityConfiguration extends GlobalMethodSecurityConfiguration {
 
     @Autowired
     private CustomPermissionEvaluator permissionEvaluator;
+
+    @Override
+    public MethodSecurityMetadataSource methodSecurityMetadataSource() {
+        return new CustomMetadataSource();
+    }
 
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler() {
@@ -48,7 +54,7 @@ public class MethodSecurityConfiguration extends GlobalMethodSecurityConfigurati
             decisionVoters.add(new PreInvocationAuthorizationAdviceVoter(expressionAdvice));
             decisionVoters.add(new RoleVoter());
             decisionVoters.add(new AuthenticatedVoter());
-//            decisionVoters.add(new CustomVoter());
+            decisionVoters.add(new CustomVoter());
 
         return new AffirmativeBased(decisionVoters);
     }
