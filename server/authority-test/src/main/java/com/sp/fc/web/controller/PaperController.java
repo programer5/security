@@ -29,11 +29,17 @@ public class PaperController {
         return paperService.getMyPapers(user.getUsername());
     }
 
+    @Secured({"ROLE_USER", "RUN_AS_PRIMARY"})
+    @GetMapping("/paper/allpapers")
+    public List<Paper> allPapers(@AuthenticationPrincipal User user) {
+        return paperService.getAllPapers();
+    }
+
 //    @Secured({"SCHOOL_PRIMARY"})
     @CustomSecurityTag("SCHOOL_PRIMARY")
     @GetMapping("/paper/getPapersByPrimary")
     public List<Paper> getPapersByPrimary(@AuthenticationPrincipal User user) {
-        return paperService.getAllPapers(user.getUsername());
+        return paperService.getAllPapers();
     }
 
 //    @PreAuthorize("hasPermission(#paperId, 'paper', 'read')")
