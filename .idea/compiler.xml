@@ -28,7 +28,9 @@
         <module name="sp-fastcampus-spring-sec.server-authority-test.main" />
         <module name="sp-fastcampus-spring-sec.server-basic-authentication-test.test" />
         <module name="sp-fastcampus-spring-sec.server-login-multi-chain.test" />
+        <module name="sp-fastcampus-spring-sec.server-authority-acl.main" />
         <module name="sp-fastcampus-spring-sec.server-login-userdetails.test" />
+        <module name="sp-fastcampus-spring-sec.server-authority-acl.test" />
         <module name="sp-fastcampus-spring-sec.server-login-rememberme.main" />
         <module name="sp-fastcampus-spring-sec.server-login-multi-chain.main" />
         <module name="sp-fastcampus-spring-sec.comp-user-admin.main" />
