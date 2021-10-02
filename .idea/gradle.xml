@@ -14,6 +14,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/comp/common-utils" />
+            <option value="$PROJECT_DIR$/comp/paper-user" />
             <option value="$PROJECT_DIR$/comp/user-admin" />
             <option value="$PROJECT_DIR$/server/authority-acl" />
             <option value="$PROJECT_DIR$/server/authority-test" />
