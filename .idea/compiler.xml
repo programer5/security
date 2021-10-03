@@ -23,6 +23,7 @@
         <module name="sp-fastcampus-spring-sec.comp-user-admin.test" />
         <module name="sp-fastcampus-spring-sec.comp-paper-user.test" />
         <module name="sp-fastcampus-spring-sec.comp-common-utils.main" />
+        <module name="sp-fastcampus-spring-sec.comp-paper.test" />
         <module name="sp-fastcampus-spring-sec.web-user-admin.test" />
         <module name="sp-fastcampus-spring-sec.server-basic-test.main" />
         <module name="sp-fastcampus-spring-sec.comp-common-utils.test" />
@@ -38,6 +39,7 @@
         <module name="sp-fastcampus-spring-sec.server-basic-authentication-test.main" />
         <module name="sp-fastcampus-spring-sec.server-login-userdetails.main" />
         <module name="sp-fastcampus-spring-sec.test-web-util.test" />
+        <module name="sp-fastcampus-spring-sec.comp-paper.main" />
         <module name="sp-fastcampus-spring-sec.web-user-admin.main" />
         <module name="sp-fastcampus-spring-sec.comp-paper-user.main" />
       </profile>
