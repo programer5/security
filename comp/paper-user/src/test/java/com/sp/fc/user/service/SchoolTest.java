@@ -24,17 +24,16 @@ public class SchoolTest {
     School school;
 
     @BeforeEach
-    void before() {
+    void before(){
         this.schoolRepository.deleteAll();
         this.schoolService = new SchoolService(schoolRepository);
-        this.schoolTestHelper = new SchoolTestHelper(schoolService);
+        this.schoolTestHelper = new SchoolTestHelper(this.schoolService);
         school = this.schoolTestHelper.createSchool("테스트 학교", "서울");
     }
 
     @DisplayName("1. 학교를 생성한다.")
     @Test
-    void test_1() {
-
+    void test_1(){
         List<School> list = schoolRepository.findAll();
         assertEquals(1, list.size());
         SchoolTestHelper.assertSchool(list.get(0), "테스트 학교", "서울");
@@ -69,5 +68,4 @@ public class SchoolTest {
         list = schoolService.findAllByCity("서울");
         assertEquals(2, list.size());
     }
-
 }

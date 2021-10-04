@@ -12,4 +12,5 @@ public class SessionManagementTestApplication {
     public static void main(String[] args) {
         SpringApplication.run(SessionManagementTestApplication.class, args);
     }
+
 }

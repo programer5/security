@@ -3,10 +3,7 @@ package com.sp.fc.web.config;
 import com.sp.fc.web.student.StudentManager;
 import com.sp.fc.web.teacher.TeacherManager;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,6 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.teacherManager = teacherManager;
     }
 
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(studentManager);
@@ -35,37 +33,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .requestMatchers(
-                        PathRequest.toStaticResources().atCommonLocations()
-                );
-    }
-
-    @Bean
-    RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
-        return roleHierarchy;
+    protected void configure(HttpSecurity http) throws Exception {
+        CustomLoginFilter filter = new CustomLoginFilter(authenticationManager());
+        http
+                .authorizeRequests(request->
+                        request.antMatchers("/", "/login").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .formLogin(
+                        login->login.loginPage("/login")
+                        .permitAll()
+                        .defaultSuccessUrl("/", false)
+                        .failureUrl("/login-error")
+                )
+                .addFilterAt(filter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout->logout.logoutSuccessUrl("/"))
+                .exceptionHandling(e->e.accessDeniedPage("/access-denied"))
+                ;
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
-        CustomLoginFilter filter = new CustomLoginFilter(authenticationManager());
-
-        http.authorizeRequests(request ->{
-            request.antMatchers("/", "/login").permitAll()
-                    .anyRequest().authenticated();
-        })
-                .formLogin(
-                        login -> login.loginPage("/login").permitAll()
-                                .defaultSuccessUrl("/", false)
-                                .failureUrl("/login-error")
-                )
-                .addFilterAfter(filter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout.logoutSuccessUrl("/"))
-                .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"));
-
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                ;
     }
 }

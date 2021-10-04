@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/teacher")
 public class MobTeacherController {
@@ -26,6 +27,5 @@ public class MobTeacherController {
     public List<Student> students(@AuthenticationPrincipal Teacher teacher){
         return studentManager.myStudents(teacher.getId());
     }
-
 
 }

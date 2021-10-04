@@ -15,17 +15,16 @@ public class PaperService implements InitializingBean {
 
     private HashMap<Long, Paper> paperDB = new HashMap<>();
 
-
     @Override
     public void afterPropertiesSet() throws Exception {
 
     }
 
-    public void setPaper(Paper paper) {
+    public void setPaper(Paper paper){
         paperDB.put(paper.getPaperId(), paper);
     }
 
-    @PostFilter("notPrepareState(filterObject)")
+    @PostFilter("notPrepareSate(filterObject)")
     public List<Paper> getMyPapers(String username) {
 //        return paperDB.values().stream().collect(Collectors.toList());
         return paperDB.values().stream().filter(
@@ -33,7 +32,7 @@ public class PaperService implements InitializingBean {
         ).collect(Collectors.toList());
     }
 
-//    @PostAuthorize("returnObject.studentIds.contains(principal.username)")
+
     public Paper getPaper(Long paperId) {
         return paperDB.get(paperId);
     }

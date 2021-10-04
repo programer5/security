@@ -25,11 +25,12 @@ public class CustomVoter implements AccessDecisionVoter<MethodInvocation> {
     public int vote(Authentication authentication, MethodInvocation object, Collection<ConfigAttribute> attributes) {
         String role = attributes.stream().filter(attr->attr.getAttribute().startsWith(PREFIX))
                 .map(attr->attr.getAttribute().substring(PREFIX.length()))
-                .findFirst().orElseGet(()-> null);
-        if (role != null && authentication.getAuthorities().stream().filter(auth->auth.getAuthority().equals("ROLE_"+role.toUpperCase()))
-                .findAny().isPresent()) {
+                .findFirst().orElseGet(()->null);
+        if(role !=null && authentication.getAuthorities().stream().filter(auth->auth.getAuthority().equals("ROLE_"+role.toUpperCase()))
+        .findAny().isPresent()) {
             return ACCESS_GRANTED;
         }
-        return ACCESS_GRANTED;
+        return ACCESS_DENIED;
     }
+
 }

@@ -1,5 +1,6 @@
 package com.sp.fc.web;
 
+
 import com.sp.fc.web.student.Student;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,15 +26,13 @@ public class MultiChainProxyTest {
 
     @DisplayName("1. choi:1 로 로그인해서 학생 리스트를 내려받는다.")
     @Test
-    void Test_1() {
-
+    void test_1(){
         ResponseEntity<List<Student>> resp = testClient.exchange("http://localhost:" + port + "/api/teacher/students",
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Student>>() {
                 });
 
         assertNotNull(resp.getBody());
         assertEquals(3, resp.getBody().size());
-        System.out.println("resp = " + resp.getBody());
-
     }
+
 }

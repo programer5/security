@@ -15,4 +15,5 @@ public class SessionInfo {
 
     private String sessionId;
     private Date time;
+
 }

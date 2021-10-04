@@ -28,14 +28,13 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                                  Serializable targetId,
                                  String targetType,
                                  Object permission) {
+        Paper paper = paperService.getPaper((long)targetId);
+        if(paper == null) throw new AccessDeniedException("시험지가 존재하지 않음.");
 
-        Paper paper = paperService.getPaper((long) targetId);
-        if (paper == null) throw new AccessDeniedException("시험지가 존재하지 않음.");
 
-        if (paper.getState() == Paper.State.PREPARE) return false;
+        if(paper.getState() == Paper.State.PREPARE) return false;
 
-        boolean canUse = paper.getStudentIds().stream().filter(
-                        userId -> userId.equals(authentication.getName()))
+        boolean canUse = paper.getStudentIds().stream().filter(userId -> userId.equals(authentication.getName()))
                 .findAny().isPresent();
 
         return canUse;

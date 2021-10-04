@@ -14,4 +14,5 @@ public class UserDetailsTestApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserDetailsTestApplication.class, args);
     }
+
 }

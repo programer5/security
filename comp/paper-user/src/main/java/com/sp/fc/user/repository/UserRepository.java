@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
+
     @Modifying(clearAutomatically = true)
     @Query("update User set name=?2, updated=?3 where userId=?1")
     void updateUserName(Long userId, String userName, LocalDateTime update);

@@ -1,17 +1,16 @@
 
 
-dependencies {
-    implementation("$boot:spring-boot-starter-web")
-    implementation("$boot:spring-boot-starter-thymeleaf")
-    implementation("$boot:spring-boot-starter-data-jpa")
-    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5")
-    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
-    implementation("mysql:mysql-connector-java")
+apply from: "../web-common.gradle"
 
-    implementation project(":comp-paper")
-    implementation project(":comp-paper-user")
-    implementation project(":web-site-manager")
-    implementation project(":web-site-student")
-    implementation project(":web-site-teacher")
+dependencies {
+
+    implementation("$boot:spring-boot-starter-data-jpa")
+    runtime("mysql:mysql-connector-java")
+
+    compile project(":comp-paper")
+    compile project(":comp-paper-user")
+    compile project(":web-site-manager")
+    compile project(":web-site-student")
+    compile project(":web-site-teacher")
 }
 

@@ -1,5 +1,6 @@
 package com.sp.fc.web.teacher;
 
+import com.sp.fc.web.student.Student;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,4 +31,5 @@ public class TeacherAuthenticationToken implements Authentication {
     public String getName() {
         return principal == null ? "" : principal.getUsername();
     }
+
 }

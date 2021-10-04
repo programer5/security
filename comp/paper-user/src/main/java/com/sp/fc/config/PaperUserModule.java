@@ -14,4 +14,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "com.sp.fc.user.domain"
 })
 public class PaperUserModule {
+
 }

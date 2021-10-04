@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,17 +16,17 @@ import javax.persistence.Id;
 @Entity
 public class Paper {
 
-    @Id @GeneratedValue
+    @Id
     private Long id;
-
     private String title;
     private String tutorId;
 //    private List<String> studentIds;
     private State state;
 
     public static enum State {
-        PREPARE,    // 출제중
-        READY,      // 시험시작
-        END         // 시험종료
+        PREPARE, // 출제 중
+        READY,  // 시험 시작
+        END  // 시험 종료
     }
+
 }

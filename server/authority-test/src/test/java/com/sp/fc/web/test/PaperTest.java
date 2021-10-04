@@ -1,5 +1,6 @@
 package com.sp.fc.web.test;
 
+
 import com.sp.fc.web.service.Paper;
 import com.sp.fc.web.service.PaperService;
 import org.junit.jupiter.api.DisplayName;
@@ -45,26 +46,9 @@ public class PaperTest extends WebIntegrationTest{
             .state(Paper.State.READY)
             .build();
 
-    @DisplayName("5. 교장선생님은 모든 시험지를 볼 수 있다.")
+    @DisplayName("6. 사용자 user1이 임시로 교장선생님 권한을 얻어서 시험지를 가져온다.")
     @Test
-    void test_5() {
-        paperService.setPaper(paper1);
-        paperService.setPaper(paper2);
-        paperService.setPaper(paper3);
-
-        client = new TestRestTemplate("primary", "1111");
-        ResponseEntity<List<Paper>> response = client.exchange(uri("/paper/getPapersByPrimary"),
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<Paper>>() {
-                });
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(3, response.getBody().size());
-        System.out.println("response = " + response.getBody());
-    }
-
-    @DisplayName("6. 사용자가 user1이 교장선생님 권한을 얻어서 시험지를 가져온다.")
-    @Test
-    void test_6() {
+    void test_6(){
         paperService.setPaper(paper1);
         paperService.setPaper(paper2);
         paperService.setPaper(paper3);
@@ -76,12 +60,33 @@ public class PaperTest extends WebIntegrationTest{
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(3, response.getBody().size());
-        System.out.println("response = " + response.getBody());
+        System.out.println(response.getBody());
+
     }
 
-    @DisplayName("1. user1이 시험지 리스트 조회한다.")
+
+    @DisplayName("5. 교장선생님은 모든 시험지를 볼 수 있다.")
     @Test
-    void test_1() {
+    void test_5(){
+        paperService.setPaper(paper1);
+        paperService.setPaper(paper2);
+        paperService.setPaper(paper3);
+
+        client = new TestRestTemplate("primary", "1111");
+        ResponseEntity<List<Paper>> response = client.exchange(uri("/paper/getPapersByPrimary"),
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<Paper>>() {
+                });
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(3, response.getBody().size());
+        System.out.println(response.getBody());
+
+    }
+
+
+    @DisplayName("1. user1이 시험지 리스트 조회한다. ")
+    @Test
+    void test_1(){
         paperService.setPaper(paper1);
         paperService.setPaper(paper2);
         paperService.setPaper(paper3);
@@ -93,7 +98,8 @@ public class PaperTest extends WebIntegrationTest{
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(1, response.getBody().size());
-        System.out.println("response = " + response.getBody());
+        System.out.println(response.getBody());
+
     }
 
     @DisplayName("2. user1이 user2의 시험지는 볼 수 없다.")

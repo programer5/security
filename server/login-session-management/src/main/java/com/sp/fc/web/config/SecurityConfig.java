@@ -20,9 +20,16 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,38 +41,30 @@ import java.time.LocalDateTime;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    ExceptionTranslationFilter exceptionTranslationFilter;
+    FilterSecurityInterceptor filterSecurityInterceptor;
+    AccessDeniedHandlerImpl accessDeniedHandler;
 
-
-    private final SpUserService userService;
+    private final SpUserService spUserService;
     private final DataSource dataSource;
 
-    public SecurityConfig(SpUserService userService, DataSource dataSource) {
-        this.userService = userService;
+    public SecurityConfig(SpUserService spUserService, DataSource dataSource) {
+        this.spUserService = spUserService;
         this.dataSource = dataSource;
-    }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService);
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .antMatchers("/sessions", "/session/expire", "/session-expired")
-                .requestMatchers(
-                        PathRequest.toStaticResources().atCommonLocations(),
-                        PathRequest.toH2Console()
-                );
+        auth.userDetailsService(spUserService);
     }
 
     @Bean
-    RoleHierarchy roleHierarchy() {
+    PasswordEncoder passwordEncoder(){
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    RoleHierarchy roleHierarchy(){
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
         return roleHierarchy;
@@ -89,74 +88,94 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
                 super.sessionIdChanged(event, oldSessionId);
-                System.out.printf("===>> [%s] 세션 아이디 변경 %s \n", LocalDateTime.now(), event.getSession().getId());
+                System.out.printf("===>> [%s] 세션 아이디 변경  %s:%s \n",  LocalDateTime.now(), oldSessionId, event.getSession().getId());
             }
         });
     }
 
     @Bean
-    SessionRegistry sessionRegistry() {
+    SessionRegistry sessionRegistry(){
         SessionRegistryImpl registry = new SessionRegistryImpl();
         return registry;
     }
 
     @Bean
-    PersistentTokenRepository tokenRepository() {
+    PersistentTokenRepository tokenRepository(){
         JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
         repository.setDataSource(dataSource);
-        try {
+        try{
             repository.removeUserTokens("1");
-        } catch (Exception e) {
+        }catch(Exception ex){
             repository.setCreateTableOnStartup(true);
         }
         return repository;
     }
 
     @Bean
-    PersistentTokenBasedRememberMeServices rememberMeServices() {
-        PersistentTokenBasedRememberMeServices service = new PersistentTokenBasedRememberMeServices("hello",
-                userService, tokenRepository()){
-            @Override
-            protected Authentication createSuccessfulAuthentication(HttpServletRequest request, UserDetails user) {
-                return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), null);
-//                return super.createSuccessfulAuthentication(request, user);
-            }
-        };
+    PersistentTokenBasedRememberMeServices rememberMeServices(){
+        PersistentTokenBasedRememberMeServices service =
+                new PersistentTokenBasedRememberMeServices("hello",
+                        spUserService,
+                        tokenRepository()
+                        ){
+                    @Override
+                    protected Authentication createSuccessfulAuthentication(HttpServletRequest request, UserDetails user) {
+                        return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), null);
+//                        return super.createSuccessfulAuthentication(request, user);
+                    }
+                };
         service.setAlwaysRemember(true);
         return service;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-        http.authorizeRequests(request ->{
-            request.antMatchers("/").permitAll()
-                    .antMatchers("/admin/**").hasRole("ADMIN")
-                    .anyRequest().authenticated();
-        })
-                .formLogin(
-                        login -> login.loginPage("/login").permitAll()
-                                .defaultSuccessUrl("/", false)
-                                .failureUrl("/login-error")
+        http
+                .authorizeRequests(request->
+                    request
+                            .antMatchers("/", "/error").permitAll()
+                            .antMatchers("/admin/**").hasRole("ADMIN")
+                            .anyRequest().authenticated()
                 )
-                .logout(logout -> logout.logoutSuccessUrl("/"))
-                .exceptionHandling(exception ->
-                        exception
-//                        .accessDeniedPage("/access-denied")
-                        .accessDeniedHandler(new CustomDeniedHandler())
+                .formLogin(login->
+                        login.loginPage("/login")
+                        .loginProcessingUrl("/loginprocess")
+                        .permitAll()
+                        .defaultSuccessUrl("/", false)
+                        .failureUrl("/login-error")
+                )
+                .logout(logout->
+                        logout.logoutSuccessUrl("/"))
+                .exceptionHandling(error->
+                        error
+//                                .accessDeniedPage("/access-denied")
+                                .accessDeniedHandler(new CustomDeniedHandler())
                                 .authenticationEntryPoint(new CustomEntryPoint())
+
                 )
-
                 .rememberMe(r->r
-
-                        .rememberMeServices(rememberMeServices()))
+                        .rememberMeServices(rememberMeServices())
+                )
                 .sessionManagement(
                         s->s
+//                                .sessionCreationPolicy(p-> SessionCreationPolicy.S)
                                 .sessionFixation(sessionFixationConfigurer -> sessionFixationConfigurer.changeSessionId())
-                                .maximumSessions(2)
-                                .maxSessionsPreventsLogin(true)
-                                .expiredUrl("/session-expired")
-                );
-
+                        .maximumSessions(2)
+                        .maxSessionsPreventsLogin(true)
+                        .expiredUrl("/session-expired")
+                )
+                ;
     }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .antMatchers("/sessions", "/session/expire", "/session-expired")
+                .requestMatchers(
+                        PathRequest.toStaticResources().atCommonLocations(),
+                        PathRequest.toH2Console()
+                )
+        ;
+    }
+
 }

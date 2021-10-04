@@ -14,9 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.*;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import javax.servlet.http.HttpSessionEvent;
@@ -27,37 +26,26 @@ import java.time.LocalDateTime;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
-
-    private final SpUserService userService;
+    private final SpUserService spUserService;
     private final DataSource dataSource;
 
-    public SecurityConfig(SpUserService userService, DataSource dataSource) {
-        this.userService = userService;
+    public SecurityConfig(SpUserService spUserService, DataSource dataSource) {
+        this.spUserService = spUserService;
         this.dataSource = dataSource;
-    }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService);
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .requestMatchers(
-                        PathRequest.toStaticResources().atCommonLocations(),
-                        PathRequest.toH2Console()
-                );
+        auth.userDetailsService(spUserService);
     }
 
     @Bean
-    RoleHierarchy roleHierarchy() {
+    PasswordEncoder passwordEncoder(){
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    RoleHierarchy roleHierarchy(){
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
         return roleHierarchy;
@@ -81,45 +69,66 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
                 super.sessionIdChanged(event, oldSessionId);
-                System.out.printf("===>> [%s] 세션 아이디 변경 %s \n", LocalDateTime.now(), event.getSession().getId());
+                System.out.printf("===>> [%s] 세션 아이디 변경  %s:%s \n",  LocalDateTime.now(), oldSessionId, event.getSession().getId());
             }
         });
     }
 
     @Bean
-    PersistentTokenRepository tokenRepository() {
+    PersistentTokenRepository tokenRepository(){
         JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
         repository.setDataSource(dataSource);
-        try {
+        try{
             repository.removeUserTokens("1");
-        } catch (Exception e) {
+        }catch(Exception ex){
             repository.setCreateTableOnStartup(true);
         }
         return repository;
     }
 
     @Bean
-    PersistentTokenBasedRememberMeServices rememberMeServices() {
-        PersistentTokenBasedRememberMeServices service = new PersistentTokenBasedRememberMeServices("hello",
-                userService, tokenRepository());
+    PersistentTokenBasedRememberMeServices rememberMeServices(){
+        PersistentTokenBasedRememberMeServices service =
+                new PersistentTokenBasedRememberMeServices("hello",
+                        spUserService,
+                        tokenRepository()
+                        );
         return service;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-        http.authorizeRequests(request ->{
-            request.antMatchers("/").permitAll()
-                    .anyRequest().authenticated();
-        })
-                .formLogin(
-                        login -> login.loginPage("/login").permitAll()
-                                .defaultSuccessUrl("/", false)
-                                .failureUrl("/login-error")
+        http
+                .authorizeRequests(request->
+                    request.antMatchers("/").permitAll()
+                            .anyRequest().authenticated()
                 )
-                .logout(logout -> logout.logoutSuccessUrl("/"))
-                .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"))
-                .rememberMe(r->r.rememberMeServices(rememberMeServices()));
-
+                .formLogin(login->
+                        login.loginPage("/login")
+                        .loginProcessingUrl("/loginprocess")
+                        .permitAll()
+                        .defaultSuccessUrl("/", false)
+                        .failureUrl("/login-error")
+                )
+                .logout(logout->
+                        logout.logoutSuccessUrl("/"))
+                .exceptionHandling(error->
+                        error.accessDeniedPage("/access-denied")
+                )
+                .rememberMe(r->r
+                        .rememberMeServices(rememberMeServices())
+                )
+                ;
     }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .requestMatchers(
+                        PathRequest.toStaticResources().atCommonLocations(),
+                        PathRequest.toH2Console()
+                )
+        ;
+    }
+
 }

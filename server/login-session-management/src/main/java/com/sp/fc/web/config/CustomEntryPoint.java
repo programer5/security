@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class CustomEntryPoint implements AuthenticationEntryPoint {
-
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,

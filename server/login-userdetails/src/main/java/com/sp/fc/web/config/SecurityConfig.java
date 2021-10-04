@@ -19,20 +19,49 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final SpUserService userService;
+    private final SpUserService spUserService;
 
-    public SecurityConfig(SpUserService userService) {
-        this.userService = userService;
-    }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+    public SecurityConfig(SpUserService spUserService) {
+        this.spUserService = spUserService;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService);
+        auth.userDetailsService(spUserService);
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder(){
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    RoleHierarchy roleHierarchy(){
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+        return roleHierarchy;
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests(request->
+                    request.antMatchers("/").permitAll()
+                            .anyRequest().authenticated()
+                )
+                .formLogin(login->
+                        login.loginPage("/login")
+                        .loginProcessingUrl("/loginprocess")
+                        .permitAll()
+                        .defaultSuccessUrl("/", false)
+                        .failureUrl("/login-error")
+                )
+                .logout(logout->
+                        logout.logoutSuccessUrl("/"))
+                .exceptionHandling(error->
+                        error.accessDeniedPage("/access-denied")
+                )
+                ;
     }
 
     @Override
@@ -41,30 +70,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(
                         PathRequest.toStaticResources().atCommonLocations(),
                         PathRequest.toH2Console()
-                );
-    }
-
-    @Bean
-    RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
-        return roleHierarchy;
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
-        http.authorizeRequests(request ->{
-            request.antMatchers("/").permitAll()
-                    .anyRequest().authenticated();
-        })
-                .formLogin(
-                        login -> login.loginPage("/login").permitAll()
-                                .defaultSuccessUrl("/", false)
-                                .failureUrl("/login-error")
                 )
-                .logout(logout -> logout.logoutSuccessUrl("/"))
-                .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"));
-
+        ;
     }
+
 }

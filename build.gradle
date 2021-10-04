@@ -16,9 +16,11 @@ buildscript {
 allprojects {
     group = "com.sp.fc"
     version = "1.0.0"
+
 }
 
 subprojects {
+
     apply plugin: "java"
     apply plugin: boot
     apply plugin: "io.spring.dependency-management"
@@ -51,9 +53,11 @@ subprojects {
     test {
         useJUnitPlatform()
     }
+
 }
 
-["comp", "web"].each {
+
+["comp", "test", "web"].each {
     def subProjectDir = new File(projectDir, it)
     subProjectDir.eachDir {dir->
         def projectName = ":${it}-${dir.name}"

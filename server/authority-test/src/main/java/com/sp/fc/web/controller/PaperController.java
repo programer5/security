@@ -1,5 +1,6 @@
 package com.sp.fc.web.controller;
 
+
 import com.sp.fc.web.config.CustomSecurityTag;
 import com.sp.fc.web.service.Paper;
 import com.sp.fc.web.service.PaperService;
@@ -12,10 +13,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@RequestMapping("/paper")
 @RestController
 public class PaperController {
 
@@ -23,29 +26,28 @@ public class PaperController {
     private PaperService paperService;
 
 //    @PreAuthorize("isStudent()")
-//    @PostFilter("notPrepareState(filterObject)")
-    @GetMapping("/paper/mypapers")
-    public List<Paper> myPapers(@AuthenticationPrincipal User user) {
+    @GetMapping("/mypapers")
+    public List<Paper> myPapers(@AuthenticationPrincipal User user){
         return paperService.getMyPapers(user.getUsername());
     }
 
     @Secured({"ROLE_USER", "RUN_AS_PRIMARY"})
-    @GetMapping("/paper/allpapers")
-    public List<Paper> allPapers(@AuthenticationPrincipal User user) {
+    @GetMapping("/allpapers")
+    public List<Paper> allpapers(@AuthenticationPrincipal User user){
         return paperService.getAllPapers();
     }
 
-//    @Secured({"SCHOOL_PRIMARY"})
     @CustomSecurityTag("SCHOOL_PRIMARY")
-    @GetMapping("/paper/getPapersByPrimary")
-    public List<Paper> getPapersByPrimary(@AuthenticationPrincipal User user) {
+    @GetMapping("/getPapersByPrimary")
+    public List<Paper> getPapersByPrimary(@AuthenticationPrincipal User user){
         return paperService.getAllPapers();
     }
 
 //    @PreAuthorize("hasPermission(#paperId, 'paper', 'read')")
-    @PostAuthorize("returnObject.studentIds.contains(#user.username)")
-    @GetMapping("/paper/get/{paperId}")
-    public Paper getPaper(@AuthenticationPrincipal User user, @PathVariable Long paperId) {
+    @PostAuthorize("returnObject.studentIds.contains(principal.username)")
+    @GetMapping("/get/{paperId}")
+    public Paper getPaper(@AuthenticationPrincipal User user, @PathVariable Long paperId){
         return paperService.getPaper(paperId);
     }
+
 }

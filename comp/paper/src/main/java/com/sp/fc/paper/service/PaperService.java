@@ -1,5 +1,6 @@
 package com.sp.fc.paper.service;
 
+
 import com.sp.fc.paper.domain.Paper;
 import com.sp.fc.paper.domain.PaperAnswer;
 import com.sp.fc.paper.repository.PaperAnswerRepository;
@@ -8,6 +9,8 @@ import com.sp.fc.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -156,9 +159,14 @@ public class PaperService {
         return paperRepository.findAllByStudyUserIdAndStateInOrderByCreatedDesc(studyUserId, states);
     }
 
+    @PostAuthorize("returnObject.isEmpty() || returnObject.get().studyUserId == principal.userId")
     @Transactional(readOnly = true)
     public Optional<Paper> findPaper(Long paperId) {
-        return paperRepository.findById(paperId);
+        return paperRepository.findById(paperId).map(paper->{
+            paper.setUser(userRepository.getOne(paper.getStudyUserId()));
+            return paper;
+        });
     }
 
 }
+

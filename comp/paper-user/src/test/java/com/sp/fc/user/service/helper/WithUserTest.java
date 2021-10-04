@@ -7,7 +7,6 @@ import com.sp.fc.user.service.SchoolService;
 import com.sp.fc.user.service.UserSecurityService;
 import com.sp.fc.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
 public class WithUserTest {
@@ -27,8 +26,8 @@ public class WithUserTest {
 
     private boolean prepared;
 
-    protected void prepareUserServices() {
-        if (prepared) return;
+    protected void prepareUserServices (){
+        if(prepared) return;
         prepared = true;
 
         this.schoolRepository.deleteAll();
@@ -41,4 +40,5 @@ public class WithUserTest {
         this.schoolTestHelper = new SchoolTestHelper(schoolService);
         this.school = this.schoolTestHelper.createSchool("테스트 학교", "서울");
     }
+
 }

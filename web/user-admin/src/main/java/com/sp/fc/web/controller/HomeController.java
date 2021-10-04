@@ -30,16 +30,11 @@ public class HomeController {
         return "LoginRequired";
     }
 
+
     @GetMapping("/login-error")
     public String loginError(Model model){
         model.addAttribute("loginError", true);
         return "loginForm";
-    }
-
-    @ResponseBody
-    @GetMapping("/auth")
-    public Authentication auth() {
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     @GetMapping("/access-denied")
@@ -52,12 +47,11 @@ public class HomeController {
         return "AccessDenied2";
     }
 
+
     @PreAuthorize("hasAnyAuthority('ROLE_USER')")
     @GetMapping("/user-page")
     public String userPage() throws YouCannotAccessUserPage {
-        if (true) {
-            throw new YouCannotAccessUserPage();
-        }
+        if(true) throw new YouCannotAccessUserPage();
         return "UserPage";
     }
 
@@ -66,4 +60,12 @@ public class HomeController {
     public String adminPage(){
         return "AdminPage";
     }
+
+
+    @ResponseBody
+    @GetMapping("/auth")
+    public Authentication auth(){
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
 }

@@ -4,12 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Set;
 
 @Data
@@ -17,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "sp_user")
+@Table(name="sp_user")
 public class User implements UserDetails {
 
     @Id
@@ -70,4 +68,5 @@ public class User implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return enabled;
     }
+
 }

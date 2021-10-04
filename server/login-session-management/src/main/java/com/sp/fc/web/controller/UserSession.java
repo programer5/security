@@ -16,7 +16,8 @@ public class UserSession {
     private String username;
     private List<SessionInfo> sessions;
 
-    public int getCount() {
+    public int getCount(){
         return sessions.size();
     }
+
 }

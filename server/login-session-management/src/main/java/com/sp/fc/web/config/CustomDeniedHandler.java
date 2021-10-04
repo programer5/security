@@ -10,14 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class CustomDeniedHandler implements AccessDeniedHandler {
-    @Override
-    public void handle(HttpServletRequest request,
-                       HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
-        if (accessDeniedException instanceof YouCannotAccessUserPage) {
+    @Override
+    public void handle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AccessDeniedException accessDeniedException) throws IOException, ServletException
+    {
+        if(accessDeniedException instanceof YouCannotAccessUserPage){
             request.getRequestDispatcher("/access-denied").forward(request, response);
-        } else {
+        }else{
             request.getRequestDispatcher("/access-denied2").forward(request, response);
         }
     }

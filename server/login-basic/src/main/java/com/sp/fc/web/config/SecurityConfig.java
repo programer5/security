@@ -11,40 +11,38 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity(debug = true)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final CustomAuthDetails customAuthDetails;
+    private final CustomAuthDetail customAuthDetail;
 
-    public SecurityConfig(CustomAuthDetails customAuthDetails) {
-        this.customAuthDetails = customAuthDetails;
+    public SecurityConfig(CustomAuthDetail customAuthDetail) {
+        this.customAuthDetail = customAuthDetail;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser(User.withDefaultPasswordEncoder()
-                        .username("user1")
-                        .password("1111")
-                        .roles("USER"))
-                .withUser(User.withDefaultPasswordEncoder()
+        auth
+                .inMemoryAuthentication()
+                .withUser(
+                        User.withDefaultPasswordEncoder()
+                                .username("user1")
+                                .password("1111")
+                                .roles("USER")
+                ).withUser(
+                User.withDefaultPasswordEncoder()
                         .username("admin")
                         .password("2222")
-                        .roles("ADMIN"));
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .requestMatchers(
-                        PathRequest.toStaticResources().atCommonLocations()
-                );
+                        .roles("ADMIN")
+        );
     }
 
     @Bean
-    RoleHierarchy roleHierarchy() {
+    RoleHierarchy roleHierarchy(){
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
         return roleHierarchy;
@@ -52,19 +50,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-        http.authorizeRequests(request ->{
-            request.antMatchers("/").permitAll()
-                    .anyRequest().authenticated();
-        })
-                .formLogin(
-                        login -> login.loginPage("/login").permitAll()
-                                .defaultSuccessUrl("/", false)
-                                .failureUrl("/login-error")
-                                .authenticationDetailsSource(customAuthDetails)
+        http
+                .authorizeRequests(request->
+                    request.antMatchers("/").permitAll()
+                            .anyRequest().authenticated()
                 )
-                .logout(logout -> logout.logoutSuccessUrl("/"))
-                .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"));
-
+                .formLogin(login->
+                        login.loginPage("/login")
+                        .loginProcessingUrl("/loginprocess")
+                        .permitAll()
+                        .defaultSuccessUrl("/", false)
+                        .authenticationDetailsSource(customAuthDetail)
+                        .failureUrl("/login-error")
+                )
+                .logout(logout->
+                        logout.logoutSuccessUrl("/"))
+                .exceptionHandling(error->
+                        error.accessDeniedPage("/access-denied")
+                )
+                ;
     }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .requestMatchers(
+                        PathRequest.toStaticResources().atCommonLocations()
+                )
+        ;
+    }
+
 }

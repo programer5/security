@@ -22,11 +22,11 @@ public class CachTest {
     @Autowired
     private CacheManager cacheManager;
 
-    Optional<Paper> getPaper(Long id) {
+    Optional<Paper> getPaper(Long id){
         return Optional.ofNullable(cacheManager.getCache("papers").get(id, Paper.class));
     }
 
-    @DisplayName("1. 조회한 Paper는 캐시에 등록된다.")
+    @DisplayName("1. 조회한 Paper 는 캐시에 등록된다.")
     @Test
     void test_() {
         Paper paper1 = Paper.builder().id(1L).title("paper1").build();
@@ -36,6 +36,6 @@ public class CachTest {
         paperRepository.findById(1L);
 
         assertTrue(getPaper(1L).isPresent());
-
     }
+
 }

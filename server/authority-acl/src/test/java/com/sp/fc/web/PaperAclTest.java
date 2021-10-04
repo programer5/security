@@ -14,18 +14,19 @@ import org.springframework.http.ResponseEntity;
 @SpringBootTest(classes = AuthorityACLApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PaperAclTest {
 
-    @Autowired
-    private PaperRepository paperRepository;
-
     @LocalServerPort
     private int port;
 
-    public String url(long paperId) {
+    @Autowired
+    private PaperRepository paperRepository;
+
+
+    public String url(long paperId){
         return "http://localhost:"+port+"/paper/"+paperId;
     }
 
     @BeforeEach
-    void before() {
+    void before(){
         paperRepository.deleteAll();
 
         Paper paper1 = new Paper(1L, "paper1",
@@ -35,10 +36,11 @@ public class PaperAclTest {
 
     @DisplayName("1. student1이 1L 시험지를 가져온다.")
     @Test
-    void test_1() {
+    void test_1(){
         TestRestTemplate client = new TestRestTemplate("student1", "1111");
         ResponseEntity<Paper> resp = client.getForEntity(url(1L), Paper.class);
 
         System.out.println(resp.getBody());
     }
+
 }

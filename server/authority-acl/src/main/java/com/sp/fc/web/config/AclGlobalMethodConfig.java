@@ -15,6 +15,7 @@ import org.springframework.security.acls.domain.*;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.JdbcMutableAclService;
 import org.springframework.security.acls.jdbc.LookupStrategy;
+import org.springframework.security.acls.model.AclCache;
 import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.PermissionGrantingStrategy;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -34,7 +35,6 @@ public class AclGlobalMethodConfig extends GlobalMethodSecurityConfiguration {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler() {
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
@@ -47,11 +47,12 @@ public class AclGlobalMethodConfig extends GlobalMethodSecurityConfiguration {
         AclPermissionEvaluator permissionEvaluator = new AclPermissionEvaluator(
                 aclService()
         );
+
         return permissionEvaluator;
     }
 
     @Bean
-    AclService aclService() {
+    public AclService aclService() {
         JdbcMutableAclService aclService = new JdbcMutableAclService(
                 dataSource(),
                 lookupStrategy(),
@@ -65,18 +66,8 @@ public class AclGlobalMethodConfig extends GlobalMethodSecurityConfiguration {
         return new EhCacheBasedAclCache(
                 aclEhCacheFactoryBean().getObject(),
                 permissionGrantingStrategy(),
-                aclAuthorizationstrategy()
+                aclAuthorizationStrategy()
         );
-    }
-
-    @Bean
-    PermissionGrantingStrategy permissionGrantingStrategy() {
-        return new DefaultPermissionGrantingStrategy(consoleAuditLogger());
-    }
-
-    @Bean
-    AuditLogger consoleAuditLogger() {
-        return new ConsoleAuditLogger();
     }
 
     @Bean
@@ -86,25 +77,35 @@ public class AclGlobalMethodConfig extends GlobalMethodSecurityConfiguration {
     }
 
     @Bean
-    EhCacheFactoryBean aclEhCacheFactoryBean() {
+    public EhCacheFactoryBean aclEhCacheFactoryBean() {
         EhCacheFactoryBean ehCacheFactoryBean = new EhCacheFactoryBean();
         ehCacheFactoryBean.setCacheManager(ehcacheFactoryBean().getObject());
-        ehCacheFactoryBean.setCacheName("alcCache");
+        ehCacheFactoryBean.setCacheName("aclCache");
         return ehCacheFactoryBean;
     }
+
+    @Bean
+    PermissionGrantingStrategy permissionGrantingStrategy(){
+        return new DefaultPermissionGrantingStrategy(consoleAuditLogger());
+    }
+
+    @Bean
+    AuditLogger consoleAuditLogger() {
+        return new ConsoleAuditLogger();
+    }
+
 
     @Bean
     LookupStrategy lookupStrategy() {
         return new BasicLookupStrategy(
                 dataSource(),
                 aclCache(),
-                aclAuthorizationstrategy(),
+                aclAuthorizationStrategy(),
                 consoleAuditLogger()
         );
     }
 
-    @Bean
-    AclAuthorizationStrategy aclAuthorizationstrategy() {
+    private AclAuthorizationStrategy aclAuthorizationStrategy() {
         return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 }
