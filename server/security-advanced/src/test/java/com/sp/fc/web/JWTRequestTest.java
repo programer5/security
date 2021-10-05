@@ -15,6 +15,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class JWTRequestTest extends WebIntegrationTest {
 
     @Autowired
@@ -55,5 +57,6 @@ public class JWTRequestTest extends WebIntegrationTest {
         ResponseEntity<String> resp2 = client.exchange(uri("/greeting"), HttpMethod.GET, body, String.class);
 
         System.out.println("resp2 = " + resp2);
+        assertEquals("hello", resp2.getBody());
     }
 }
