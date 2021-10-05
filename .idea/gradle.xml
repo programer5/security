@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/server/login-session-management" />
             <option value="$PROJECT_DIR$/server/login-userdetails" />
             <option value="$PROJECT_DIR$/server/paper-app" />
+            <option value="$PROJECT_DIR$/server/security-advanced" />
             <option value="$PROJECT_DIR$/test/web-util" />
             <option value="$PROJECT_DIR$/web/site-manager" />
             <option value="$PROJECT_DIR$/web/site-student" />

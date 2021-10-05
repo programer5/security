@@ -22,6 +22,7 @@
         <module name="sp-fastcampus-spring-sec.server-login-basic.main" />
         <module name="sp-fastcampus-spring-sec.server-login-custom-filter.main" />
         <module name="sp-fastcampus-spring-sec.web-student-teacher.main" />
+        <module name="sp-fastcampus-spring-sec.server-security-advanced.test" />
         <module name="sp-fastcampus-spring-sec.comp-user-admin.test" />
         <module name="sp-fastcampus-spring-sec.comp-paper-user.test" />
         <module name="sp-fastcampus-spring-sec.comp-common-utils.main" />
@@ -42,6 +43,7 @@
         <module name="sp-fastcampus-spring-sec.server-login-multi-chain.main" />
         <module name="sp-fastcampus-spring-sec.comp-user-admin.main" />
         <module name="sp-fastcampus-spring-sec.server-paper-app.main" />
+        <module name="sp-fastcampus-spring-sec.server-security-advanced.main" />
         <module name="sp-fastcampus-spring-sec.server-basic-authentication-test.main" />
         <module name="sp-fastcampus-spring-sec.web-site-student.test" />
         <module name="sp-fastcampus-spring-sec.server-login-userdetails.main" />
