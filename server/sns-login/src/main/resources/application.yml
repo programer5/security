@@ -1,0 +1,13 @@
+server:
+  port: 9061
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 67069480789-opbiv19f8429jqji57qv0r8beg1fcr53.apps.googleusercontent.com
+            clientSecret: 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
+
+#        provider:
